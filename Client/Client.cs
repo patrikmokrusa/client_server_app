@@ -54,7 +54,6 @@ public class Client
 
     private string GetRequestString(string requestKw, string id, string name, string surname)
     {
-        
         if (requestKw == "GET")
         {
             return $"GET {id} x x";

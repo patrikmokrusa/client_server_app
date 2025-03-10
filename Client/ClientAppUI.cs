@@ -14,7 +14,7 @@ namespace Client
             InitializeComponent();
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void ClientAppUI_Load(object sender, EventArgs e)
         {
             table.Columns.Add("ID", typeof(int));
             table.Columns.Add("Name", typeof(string));
@@ -31,9 +31,6 @@ namespace Client
                 {
                     // user pressed cancel
                     Application.Exit();
-
-                    //ip = "127.0.0.1";
-                    //port = 8910;
                 }
                 else
                 {
@@ -57,23 +54,25 @@ namespace Client
 
         private void addButton_Click(object sender, EventArgs e)
         {
-            if (idTextBox.Text == "" ||
-                nameTextBox.Text == "" ||
+            if (nameTextBox.Text == "" ||
                 surnameTextBox.Text == "")
             {
                 MessageBox.Show("Please fill-out all boxes.");
                 return;
             }
-            var res = LabelRequest("ADD", idTextBox.Text, nameTextBox.Text, surnameTextBox.Text);
+            var res = RequestWrapper("ADD", idTextBox.Text, nameTextBox.Text, surnameTextBox.Text);
 
-            var update = LabelRequest("GETALL");
+            var update = RequestWrapper("GETALL");
             UpdateDataGrid(update);
         }
 
         private void UpdateDataGrid(string data)
         {
-            if (data == "") return;
-
+            if (data == "" || data == "NO USERS!\n")
+            {
+                table.Clear();
+                return;
+            }
             table.Clear();
             var lines = data.Split('\n');
             foreach (var line in lines)
@@ -94,7 +93,7 @@ namespace Client
         // refresh button
         private void getAllButton_Click(object sender, EventArgs e)
         {
-            var update = LabelRequest("GETALL");
+            var update = RequestWrapper("GETALL");
             UpdateDataGrid(update);
         }
 
@@ -107,9 +106,9 @@ namespace Client
                 MessageBox.Show("Please fill-out all boxes.");
                 return;
             }
-            var res = LabelRequest("EDIT", idTextBox.Text, nameTextBox.Text, surnameTextBox.Text);
+            var res = RequestWrapper("EDIT", idTextBox.Text, nameTextBox.Text, surnameTextBox.Text);
             
-            UpdateDataGrid(LabelRequest("GETALL"));
+            UpdateDataGrid(RequestWrapper("GETALL"));
             ClearTextBoxes();
         }
 
@@ -120,7 +119,7 @@ namespace Client
                 MessageBox.Show("Please enter an ID.");
                 return;
             }
-            var res = LabelRequest("DELETE", idTextBox.Text);
+            var res = RequestWrapper("DELETE", idTextBox.Text);
             if (res == "")
             {
                 return;
@@ -129,10 +128,11 @@ namespace Client
             {
                 MessageBox.Show("ID not found. Nothing is deleted.");
             }
-            UpdateDataGrid(LabelRequest("GETALL"));
+            UpdateDataGrid(RequestWrapper("GETALL"));
             ClearTextBoxes();
         }
 
+        // used to prefill textboxes when a row is clicked
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {
             var index = e.RowIndex;
@@ -143,9 +143,13 @@ namespace Client
             surnameTextBox.Text = row.Cells[2].Value.ToString();
         }
 
-        // request wrapper to show status message
-        private string LabelRequest(string requestKw, string id = "", string name = "", string surname = "")
+        // request wrapper to show status message 
+        private string RequestWrapper(string requestKw, string id = "", string name = "", string surname = "")
         {
+            id = NormalizeValue(id);
+            name = NormalizeValue(name);
+            surname = NormalizeValue(surname);
+
             try
             {
                 return client.Request(requestKw, id, name, surname);
@@ -155,6 +159,13 @@ namespace Client
                 MessageBox.Show("Server is not running.");
                 return "";
             }
+        }
+
+        private string NormalizeValue(string str)
+        {
+            str = str.Trim();
+            str = str.Replace(' ', '_');
+            return str;
         }
     }
 }

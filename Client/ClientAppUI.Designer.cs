@@ -176,7 +176,7 @@
             Controls.Add(dataGridView);
             Name = "ClientAppUI";
             Text = "Client app";
-            Load += Form1_Load;
+            Load += ClientAppUI_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridView).EndInit();
             ResumeLayout(false);
             PerformLayout();
