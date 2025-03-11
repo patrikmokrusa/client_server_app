@@ -1,7 +1,5 @@
 using System.Data;
-using System.Reflection.Metadata.Ecma335;
 using Microsoft.VisualBasic;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Client
 {
@@ -57,7 +55,7 @@ namespace Client
             if (nameTextBox.Text == "" ||
                 surnameTextBox.Text == "")
             {
-                MessageBox.Show("Please fill-out all boxes.");
+                MessageBox.Show("Please fill-out name and surname.");
                 return;
             }
             var res = RequestWrapper("ADD", idTextBox.Text, nameTextBox.Text, surnameTextBox.Text);
