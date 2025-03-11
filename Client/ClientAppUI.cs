@@ -29,6 +29,7 @@ namespace Client
                 {
                     // user pressed cancel
                     Application.Exit();
+                    return;
                 }
                 else
                 {
